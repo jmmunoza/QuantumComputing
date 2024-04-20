@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from ..qgate import QGate
+from ...qgate import QGate
 
 
 class GDiffuser(QGate): 

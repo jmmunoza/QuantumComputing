@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,25 +17,33 @@ class QCircuit:
         self.state = np.zeros(2**n_qubits, dtype=complex)
         self.state[0] = 1
         self.name = name
+        self.gates: List[Tuple[QGate, int]] = []
 
     def h(self, qbits: Union[int, List[int], range]):
-        self.apply_gate(Hadamard(), qbits)
+        self.append(Hadamard(), qbits)
         
     def x(self, qbits: Union[int, List[int], range]):
-        self.apply_gate(PauliX(), qbits)
+        self.append(PauliX(), qbits)
         
     def z(self, qbits: Union[int, List[int], range]):
-        self.apply_gate(PauliZ(), qbits)
+        self.append(PauliZ(), qbits)
         
     def y(self, qbits: Union[int, List[int], range]):
-        self.apply_gate(PauliY(), qbits)
-                
-    def apply_gate(self, gate: QGate, qubits: Union[int, List[int], range]):
+        self.append(PauliY(), qbits)
+        
+    def append(self, gate: QGate, qubits: Union[int, List[int], range]):
         if isinstance(qubits, int):
             qubits = [qubits]
         elif isinstance(qubits, range):
             qubits = list(qubits)
             
+        self.gates.append([gate, qubits])
+        
+    def run(self):
+        for gate, qubits in self.gates:
+            self.apply_gate(gate, qubits)
+                
+    def apply_gate(self, gate: QGate, qubits: List[int]):            
         qubit_indices = [1 if i in qubits else 0 for i in range(self.n_qubits)]
             
         self.state = gate.apply(self.state, qubit_indices)  

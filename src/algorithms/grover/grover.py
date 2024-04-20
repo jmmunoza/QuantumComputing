@@ -1,8 +1,8 @@
 import numpy as np
 
-from ...gates.gdiffuser import GDiffuser
 from ...qcircuit import QCircuit
 from ...qgate import QGate
+from .gdiffuser import GDiffuser
 
 
 class Grover(QCircuit):
@@ -11,16 +11,13 @@ class Grover(QCircuit):
         
         n_iterations = int(np.pi / 4 * np.sqrt(2**n_qubits))-1
         
-        print(n_iterations)
-        
         self.h(range(n_qubits))
         
         for _ in range(n_iterations):
-            # Apply the oracle
-            self.apply_gate(oracle, range(n_qubits))
+            self.append(oracle, range(n_qubits))
             self.h(range(n_qubits))
 
-            self.apply_gate(GDiffuser(), range(n_qubits))
+            self.append(GDiffuser(), range(n_qubits))
             self.h(range(n_qubits))
 
         
