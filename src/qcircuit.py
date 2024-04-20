@@ -19,18 +19,6 @@ class QCircuit:
         self.name = name
         self.gates: List[Tuple[QGate, int]] = []
 
-    def h(self, qbits: Union[int, List[int], range]):
-        self.append(Hadamard(), qbits)
-        
-    def x(self, qbits: Union[int, List[int], range]):
-        self.append(PauliX(), qbits)
-        
-    def z(self, qbits: Union[int, List[int], range]):
-        self.append(PauliZ(), qbits)
-        
-    def y(self, qbits: Union[int, List[int], range]):
-        self.append(PauliY(), qbits)
-        
     def append(self, gate: QGate, qubits: Union[int, List[int], range]):
         if isinstance(qubits, int):
             qubits = [qubits]
@@ -42,12 +30,12 @@ class QCircuit:
     def run(self):
         for gate, qubits in self.gates:
             self.apply_gate(gate, qubits)
-                
+                      
     def apply_gate(self, gate: QGate, qubits: List[int]):            
         qubit_indices = [1 if i in qubits else 0 for i in range(self.n_qubits)]
             
         self.state = gate.apply(self.state, qubit_indices)  
-    
+        
     def draw(self):
         vector = self.state
         states = [intToBinary(i, self.n_qubits) for i in range(len(vector))]
@@ -62,13 +50,23 @@ class QCircuit:
 
         plt.show()
 
-    def __str__(self):
-        vector = self.state
+    def h(self, qbits: Union[int, List[int], range]):
+        self.append(Hadamard(), qbits)
         
+    def x(self, qbits: Union[int, List[int], range]):
+        self.append(PauliX(), qbits)
+        
+    def z(self, qbits: Union[int, List[int], range]):
+        self.append(PauliZ(), qbits)
+        
+    def y(self, qbits: Union[int, List[int], range]):
+        self.append(PauliY(), qbits)
+
+    def __str__(self):
         state_strings = ["==================================", "State:"]
 
-        for i, amplitude in enumerate(vector):
-            binary = intToBinary(i, int(np.log2(len(vector))))
+        for i, amplitude in enumerate(self.state):
+            binary = intToBinary(i, int(np.log2(len(self.state))))
             
             state_strings.append(f"{amplitude:.5f} |{binary}>")
         state_strings.append("==================================")  

@@ -19,4 +19,4 @@ class Oracle(QGate):
         return np.dot(self.matrix, state)
     
     def __str__(self):
-        return "Oracle"
+        return f"Oracle ({self.value})"
