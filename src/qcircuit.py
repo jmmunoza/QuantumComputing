@@ -1,22 +1,21 @@
 from typing import List, Union
 
 import matplotlib.pyplot as plt
+import numpy as np
 
-from .gates.controlx import ControlX
 from .gates.hadamard import Hadamard
 from .gates.paulix import PauliX
 from .gates.pauliy import PauliY
 from .gates.pauliz import PauliZ
-from .qbit import Qbit
 from .qgate import QGate
 from .util.binaryparser import intToBinary
-from .util.qbitparser import qbitsToVector
 
 
 class QCircuit:
-    def __init__(self, n_qbits: int, name: str="QCircuit"):
-        self.qbits = [Qbit(1, 0) for _ in range(n_qbits)]
-        self.gates: list[list[QGate]] = []
+    def __init__(self, n_qubits: int, name: str="QCircuit"):
+        self.n_qubits = n_qubits
+        self.state = np.zeros(2**n_qubits, dtype=complex)
+        self.state[0] = 1
         self.name = name
 
     def h(self, qbits: Union[int, List[int], range]):
@@ -30,48 +29,43 @@ class QCircuit:
         
     def y(self, qbits: Union[int, List[int], range]):
         self.apply_gate(PauliY(), qbits)
-        
-    def cx(self, qbits: Union[int, List[int], range]):
-        self.apply_gate(ControlX(), qbits)
                 
-    def apply_gate(self, gate: QGate, qbits: Union[int, List[int], range]):
-        if isinstance(qbits, int):
-            qbits_to_apply = [qbits]
-        elif isinstance(qbits, range):
-            qbits_to_apply = list(qbits)
-        else: 
-            qbits_to_apply = qbits
+    def apply_gate(self, gate: QGate, qubits: Union[int, List[int], range]):
+        if isinstance(qubits, int):
+            qubits = [qubits]
+        elif isinstance(qubits, range):
+            qubits = list(qubits)
             
-        self.qbits = gate.apply(self.qbits, qbits_to_apply)  
+        qubit_indices = [1 if i in qubits else 0 for i in range(self.n_qubits)]
             
-        for i, qbit in enumerate(self.qbits):
-            print(f"Qbit {i}: {qbit}")
+        self.state = gate.apply(self.state, qubit_indices)  
     
     def draw(self):
-        vector = qbitsToVector(self.qbits)
- 
-        states = [intToBinary(i, len(self.qbits)) for i in range(2**len(self.qbits))]
-
-        plt.bar(states, vector)
+        vector = self.state
+        states = [intToBinary(i, self.n_qubits) for i in range(len(vector))]
+        colors = ['red' if amplitude < 0 else 'blue' for amplitude in vector]
+        
+        plt.bar(states, np.abs(vector), color=colors)
         plt.xlabel("State")
         plt.ylabel("Amplitude")
         plt.title(self.name)
         plt.xticks(rotation=90)
-        plt.ylim(-1, 1) 
+        plt.ylim(0, 1) 
 
         plt.show()
-                
-    def __repr__(self):
-        return self.__str__()
 
     def __str__(self):
-        vector = qbitsToVector(self.qbits)
+        vector = self.state
         
         state_strings = ["==================================", "State:"]
 
         for i, amplitude in enumerate(vector):
-            state_strings.append(f"{amplitude:.10f} |{intToBinary(i, len(self.qbits))}>")
-
+            binary = intToBinary(i, int(np.log2(len(vector))))
+            
+            state_strings.append(f"{amplitude:.5f} |{binary}>")
         state_strings.append("==================================")  
 
         return "\n".join(state_strings)
+    
+    def __repr__(self):
+        return self.__str__()

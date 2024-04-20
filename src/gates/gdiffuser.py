@@ -1,21 +1,18 @@
 import numpy as np
+from numpy.typing import NDArray
 
-from ..qbit import Qbit
 from ..qgate import QGate
-from ..util.qbitparser import qbitsToVector, vectorToQbits
 
 
 class GDiffuser(QGate): 
     def __init__(self):
         super().__init__(None)
         
-    def apply(self, state: list[Qbit]):
-        n_qbits = len(state)
-        self._calculate_matrix(n_qbits)
-        statevector = qbitsToVector(state)
-        statevector = np.dot(self.matrix, statevector)
-      
-        return vectorToQbits(statevector)
+    def apply(self, state: NDArray, qbits_to_apply: list[int] = None):
+        self._calculate_matrix(len(qbits_to_apply))
+
+        return np.dot(self.matrix, state)
+
     '''
     Generates the matrix for the Grover diffuser
         
@@ -30,6 +27,3 @@ class GDiffuser(QGate):
         
         for i in range(1, 2**n_qbits):
             self.matrix[i, i] = -1
-
-    def __str__(self):
-        return "Hadamard"

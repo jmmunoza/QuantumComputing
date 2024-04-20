@@ -1,22 +1,20 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from .qbit import Qbit
-from .util.qbitparser import qbitsToVector
-
 
 class QGate:
     def __init__(self, matrix: NDArray):
         self.matrix = matrix
 
-    def apply(self, state: list[Qbit], qbits_to_apply: list[int] = None):
-        for qbit in state:
-            vector = qbitsToVector([qbit])
-            vector = np.dot(self.matrix, vector)
-            qbit.a = vector[0]
-            qbit.b = vector[1]
-
-        return state
+    def apply(self, state: NDArray, qbits_to_apply: list[int] = None):
+        n_qubits = len(qbits_to_apply)
+        
+        target_matrix = self.matrix if qbits_to_apply[-1] == 1 else np.eye(2)
+        
+        for i in range(1, n_qubits):
+            target_matrix = np.kron(target_matrix, self.matrix if qbits_to_apply[n_qubits - 1 - i] == 1 else np.eye(2))
+         
+        return np.dot(target_matrix, state)
 
     def __str__(self):
         return str(self.matrix)
