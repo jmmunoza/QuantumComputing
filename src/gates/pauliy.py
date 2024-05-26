@@ -8,4 +8,4 @@ class PauliY(QGate):
         super().__init__(np.array([[0, -1j], [1j, 0]]))
         
     def __str__(self):
-        return "Pauli Y"
+        return "Y"

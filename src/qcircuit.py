@@ -1,3 +1,4 @@
+import random
 from typing import List, Tuple, Union
 
 import matplotlib.pyplot as plt
@@ -49,6 +50,18 @@ class QCircuit:
         plt.ylim(0, 1) 
 
         plt.show()
+        
+    def draw_circuit(self):
+        circuit_str = ""
+        for i in range(self.n_qubits):
+            circuit_str += f"q{i}: "
+            for gate, qubits in self.gates:
+                if i in qubits:
+                    circuit_str += f"-{gate}-"
+                else:
+                    circuit_str += f"-{'-'*len(str(gate))}-"
+            circuit_str += "\n"
+        print(circuit_str)
 
     def h(self, qbits: Union[int, List[int], range]):
         self.append(Hadamard(), qbits)

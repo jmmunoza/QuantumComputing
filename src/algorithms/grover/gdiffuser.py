@@ -29,4 +29,4 @@ class GDiffuser(QGate):
             self.matrix[i, i] = -1
         
     def __str__(self):
-        return "Grover Diffuser"
+        return "GD"

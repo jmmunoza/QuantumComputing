@@ -8,4 +8,4 @@ class Hadamard(QGate):
         super().__init__(np.array([[1, 1], [1, -1]]) / np.sqrt(2))
         
     def __str__(self):
-        return "Hadamard"
+        return "H"

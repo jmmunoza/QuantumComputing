@@ -10,7 +10,7 @@ class Grover(QCircuit):
         super().__init__(n_qubits, "Grover")
         
         n_iterations = int(np.pi / 4 * np.sqrt(2**n_qubits))-1
-        
+
         self.h(range(n_qubits))
         
         for _ in range(n_iterations):

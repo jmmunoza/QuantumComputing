@@ -8,4 +8,4 @@ class PauliZ(QGate):
         super().__init__(np.array([[1, 0], [0, -1]]))
         
     def __str__(self):
-        return "Pauli Z"
+        return "Z"
